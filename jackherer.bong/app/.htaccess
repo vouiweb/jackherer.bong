@@ -1,0 +1,8 @@
+AddDefaultCharset UTF-8
+
+DirectoryIndex index.php
+ErrorDocument 404 /app/templates/404.php
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]

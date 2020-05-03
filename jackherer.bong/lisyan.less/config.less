@@ -1,0 +1,143 @@
+@import "lisyan.ignore/colors.less";
+@import "fonts.css" all;
+
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+html {
+
+	min-width: 449px;
+	font-size: 16px;
+
+	@media (min-width: 730px) and (max-width: 992px) {
+		font-size: 14px;
+	}
+	@media (min-width: 600px) and (max-width: 730px) {
+		font-size: 13px;
+	}
+	@media (min-width: 390px) and (max-width: 600px) {
+    font-size: 16px;
+	}
+
+}
+
+body {
+	color: @color-black;
+	font-family: Segoe UI, Arial, sans-serif;
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+input,
+textarea,
+p,
+blockquote,
+th,
+td {
+  	margin: 0;
+  	padding: 0;
+}
+table {
+  	border-collapse: collapse;
+  	border-spacing: 0;
+}
+fieldset,
+img,
+abbr {
+  	border: 0;
+}
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+  	font-style: normal;
+  	font-weight: normal;
+}
+ul li {
+  	list-style: none;
+}
+caption,
+th {
+  	text-align: left;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  	font-size: 100%;
+  	font-weight: normal;
+}
+sup {
+  	vertical-align: text-top;
+}
+sub {
+  	vertical-align: text-bottom;
+}
+input,
+textarea,
+select {
+  	font-family: inherit;
+  	font-size: inherit;
+  	font-weight: inherit;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+nav,
+section {
+  	display: block;
+}
+a {
+	color: #222222;
+	text-decoration: none;
+}
+img {
+
+	max-width: 100%;
+	height: auto;
+
+    pointer-events: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.clear { clear: both; }
+
+.flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  
+  justify-content: center;
+  align-items: flex-start
+}
