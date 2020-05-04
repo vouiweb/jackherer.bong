@@ -75,6 +75,9 @@
 
 					$userinfo = R::dispense('userinfo');
 					$userinfo->name = $data['name'];
+					$userinfo->gender = $data['gender'];
+					$userinfo->age = $data['age'];
+					$userinfo->profession = $data['profession'];
 					R::store($userinfo);
 
 					$userpassword = R::dispense('userpassword');
@@ -99,8 +102,21 @@
 				<input type="text" name="name" value="<?php echo @$data['name']; ?>" required>
 			</p>
 			<p>
+				<p><strong>Ваш пол: </strong></p>
+			   <input type="radio" name="gender" value="парень" required> Я парень<Br>
+			   <input type="radio" name="gender" value="девушка" required> Я девушка</p>
+			</p>
+			<p>
 				<p><strong>Ваш E-mail: </strong></p>
 				<input type="email" name="email" value="<?php echo @$data['email']; ?>" required>
+			</p>
+			<p>
+				<p><strong>Ваш возраст: </strong></p>
+				<input type="number" name="age" value="<?php echo @$data['age']; ?>" required>
+			</p>
+			<p>
+				<p><strong>Какая у вас профессия: </strong></p>
+				<input type="text" name="profession" value="<?php echo @$data['profession']; ?>" required>
 			</p>
 			<p>
 				<p><strong>Введите пароль: </strong></p>

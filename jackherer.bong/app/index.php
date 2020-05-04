@@ -36,7 +36,10 @@
 			include $_SERVER['DOCUMENT_ROOT'].$pathIndex."/templates/header/header.php"; 
 		?>
 		
-		<?php echo($_SESSION['logged_user']->id); ?>
+		<?php
+			$userinfo = R::load('userinfo', $_SESSION['logged_user']->id);
+			echo $userinfo->name;
+		?>
 
 	</body>
 </html>
