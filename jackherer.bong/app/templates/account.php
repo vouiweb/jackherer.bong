@@ -35,9 +35,20 @@
 		<?php 
 			include $_SERVER['DOCUMENT_ROOT'].$pathIndex."/templates/header/header.php"; 
 		?>
+		
+		<hr>
+		<br>
 
-		<?php 
-			
+		<a href="<?php echo $pathIndex.'/templates/edit' ?>">Редактирование учётной записи</a>
+
+		<?php
+			/* сделать по id при открытии страницы любого пользователя
+			if (isset($_SESSION['logged_user'])) {
+			    echo "Online";
+			}
+			else{
+			    echo "Offline";
+			}*/
 		?>
 
 		<script>

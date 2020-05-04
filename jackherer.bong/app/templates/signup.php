@@ -30,6 +30,7 @@
 	      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	    <![endif]-->
 	</head>
+
 	<body>
 
 		<?php
@@ -39,6 +40,8 @@
 
 		<?php
 
+			echo $x;
+			echo $y;
 			# Регистрация пользователя
 
 			$data = $_POST;
@@ -62,6 +65,21 @@
 					Не менее 7-и символов, Русские или Латинские буквы, хотя бы 1 цифра
 				*/
 
+				// Проверка возраста:
+				/*
+					Только цифры и не более 3
+				*/
+
+				// Проверка возраста
+				/*
+					на пустоту
+				*/
+
+				// Проверка профессии
+				/*
+					на пустоту
+				*/
+
 
 				if ($data['password_2'] != $data['password_1']) {
 					$errors[] = 'Пароли не совпадают!';
@@ -73,11 +91,33 @@
 
 				if(empty($errors)) {
 
+				    if (!empty($_SERVER['HTTP_CLIENT_IP']))
+				    {
+				        $ip=$_SERVER['HTTP_CLIENT_IP'];
+				    }
+				    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+				    {
+				        $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+				    }
+				    else
+				    {
+				        $ip=$_SERVER['REMOTE_ADDR'];
+				    }
+
+					$result = file_get_contents("http://ipgeobase.ru:7020/geo?ip=".$ip);
+					$xml = new SimpleXMLElement($result);
+
 					$userinfo = R::dispense('userinfo');
 					$userinfo->name = $data['name'];
 					$userinfo->gender = $data['gender'];
 					$userinfo->age = $data['age'];
+					if (!empty($xml->ip->city))
+					{
+						$userinfo->city = $xml->ip->city;
+					}
+					$userinfo->location = $x.';'.$y;
 					$userinfo->profession = $data['profession'];
+					$userinfo->status_account = "default";
 					R::store($userinfo);
 
 					$userpassword = R::dispense('userpassword');
@@ -85,8 +125,12 @@
 					$userpassword->password = md5($data['password_1']);
 					R::store($userpassword);
 
-					echo '<script>$(function(){$(".form__status").html("Вы успешно зарегистрировались!");})</script>';
-					$url_redirect = $pathIndex.'/templates/login';
+					#echo '<script>$(function(){$(".form__status").html("Вы успешно зарегистрировались!");})</script>';
+
+					$user = R::findOne('userpassword', 'email = ?', array($data['email']));
+					$_SESSION['logged_user'] = $user;
+
+					$url_redirect = $pathIndex.'/templates/edit';
 					echo '<script>$(function(){window.location.href = "'.$url_redirect.'";})</script>';
 
 				} else {
@@ -103,8 +147,8 @@
 			</p>
 			<p>
 				<p><strong>Ваш пол: </strong></p>
-			   <input type="radio" name="gender" value="парень" required> Я парень<Br>
-			   <input type="radio" name="gender" value="девушка" required> Я девушка</p>
+			   <input type="radio" name="gender" value="парень" required> Я парень
+			   <input type="radio" name="gender" value="девушка" required> Я девушка
 			</p>
 			<p>
 				<p><strong>Ваш E-mail: </strong></p>
@@ -132,6 +176,22 @@
 
 		<script>
 			$("#registration").css("color", "#333333");
+		</script>
+
+		<script>
+			// пока сюда это определим, это определение местоположения пользователя
+			$(document).ready(function() {
+				  navigator.geolocation.getCurrentPosition(sendPosition);
+				  function sendPosition(position) {
+					    $.ajax({
+					        url : 'signup.php',
+					        type : 'POST',
+					        x : position.coords.latitude,
+					        y : position.coords.longitude,
+					    });
+				  }
+
+			});
 		</script>
 
 	</body>
