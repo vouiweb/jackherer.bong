@@ -56,6 +56,10 @@
 				} else {
 					$errors[] = 'Пользователь с таким логином не найден!';
 				}
+
+				if(!empty($errors)) { 
+					echo '<script>$(function(){$(".form__status").html("'.array_shift($errors).'");})</script>';
+				}
 			}
 		?>
 

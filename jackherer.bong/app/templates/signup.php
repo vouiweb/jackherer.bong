@@ -47,9 +47,21 @@
 				
 				$errors = array();
 
-				if (empty($data['name']) or empty($data['email']) or empty($data['password_1']) or empty($data['password_2'])) {
-					$errors[] = 'Заполните все поля!';
-				}
+				// Проверка на пустоту каждого поля, на случай если валидация формы не сработает
+				// Добавить ограничения для "Имя":
+				/* 
+					не менее 3-х букв, и не более 13 букв
+					Только русские и латинские буквы(регуляркой)
+					запретить символы и цифры
+				*/
+
+				// Добавить верификацию для E-mail
+				
+				// Добавить ограничения для "Пароль":
+				/*
+					Не менее 7-и символов, Русские или Латинские буквы, хотя бы 1 цифра
+				*/
+
 
 				if ($data['password_2'] != $data['password_1']) {
 					$errors[] = 'Пароли не совпадают!';
@@ -71,6 +83,8 @@
 					R::store($userpassword);
 
 					echo '<script>$(function(){$(".form__status").html("Вы успешно зарегистрировались!");})</script>';
+					$url_redirect = $pathIndex.'/templates/login';
+					echo '<script>$(function(){window.location.href = "'.$url_redirect.'";})</script>';
 
 				} else {
 					echo '<script>$(function(){$(".form__status").html("'.array_shift($errors).'");})</script>';
@@ -82,19 +96,19 @@
 		<form action="signup.php" method="POST" class="form">
 			<p>
 				<p><strong>Ваше имя: </strong></p>
-				<input type="text" name="name" value="<?php echo @$data['name']; ?>">
+				<input type="text" name="name" value="<?php echo @$data['name']; ?>" required>
 			</p>
 			<p>
 				<p><strong>Ваш E-mail: </strong></p>
-				<input type="email" name="email" value="<?php echo @$data['email']; ?>" >
+				<input type="email" name="email" value="<?php echo @$data['email']; ?>" required>
 			</p>
 			<p>
 				<p><strong>Введите пароль: </strong></p>
-				<input type="password" name="password_1" value="<?php echo @$data['password_1']; ?>" >
+				<input type="password" name="password_1" value="<?php echo @$data['password_1']; ?>" required>
 			</p>
 			<p>
 				<p><strong>Повторите пароль: </strong></p>
-				<input type="password" name="password_2" value="<?php echo @$data['password_2']; ?>">
+				<input type="password" name="password_2" value="<?php echo @$data['password_2']; ?>" required>
 			</p>
 			<button type="submit" name="do_signup">Зарегистрироваться</button>
 			<span class="form__status"></span>
