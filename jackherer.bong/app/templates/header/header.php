@@ -4,6 +4,14 @@
 	<h1><a href="<?php echo $pathIndex ?>">Tinder #2 - Придумать название!</a></h1>
 	<nav>
 		<?php if ( isset($_SESSION['logged_user']) ) : ?>
+			<?php
+				if (R::load('userinfo', $_SESSION['logged_user']->id)->name == NULL) {
+					if (basename($_SERVER['PHP_SELF'], ".php") != "edit") {
+						$url_redirect = $pathIndex.'/templates/edit';
+						echo '<script>$(function(){window.location.href = "'.$url_redirect.'";})</script>';
+					}
+				} 
+			 ?>
 			<a href="<?php echo $pathIndex.'/templates/account' ?>" id="account">Личный Кабинет</a>
 			<a href="<?php echo $pathIndex.'/templates/logout' ?>">Выход</a>
 		<?php else : ?> 

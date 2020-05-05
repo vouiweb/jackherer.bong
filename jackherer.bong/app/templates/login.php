@@ -64,14 +64,11 @@
 		?>
 
 		<form action="login.php" method="POST" class="form">
-			<p>
-				<p><strong>Ваш E-mail: </strong></p>
-				<input type="email" name="email" value="<?php echo @$data['email']; ?>" >
-			</p>
-			<p>
-				<p><strong>Введите пароль: </strong></p>
-				<input type="password" name="password" value="<?php echo @$data['password']; ?>" >
-			</p>
+			<p><strong>Ваш E-mail: </strong></p>
+			<input type="email" name="email" value="<?php echo @$data['email']; ?>" >
+			<p><strong>Введите пароль: </strong></p>
+			<input type="password" name="password" value="<?php echo @$data['password']; ?>" >
+			<br>
 			<button type="submit" name="do_login">Авторизация</button>
 			<span class="form__status"></span>
 		</form>
