@@ -48,6 +48,10 @@
 				
 				$errors = array();
 
+				if (strlen($data['surname']) < 7) {
+					$errors[] = 'Пароль должен иметь длину не менее 7 знаков';
+				}
+
 				if ($data['password_2'] != $data['password_1']) {
 					$errors[] = 'Пароли не совпадают!';
 				}
@@ -55,6 +59,12 @@
 				if(R::count('userpassword', 'email = ?', array($data['email'])) > 0) {
 					$errors[] = 'Такой E-mail уже используется другим пользователем!';
 				}
+
+				if (empty($data['email'])) {
+			    	$errors[] = "Не заполнено обязательное поле - email";
+			  	} elseif ( filter_var($_POST["email"], FILTER_VALIDATE_EMAIL) === false) { 
+			    	$errors[] = "формат почтового ящика неправильный";
+			  	}
 
 				if(empty($errors)) {
 

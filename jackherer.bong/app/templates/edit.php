@@ -47,44 +47,68 @@
 
 			$data = $_POST;
 
-			// Проверка на пустоту каждого поля, на случай если валидация формы не сработает
-			// Добавить ограничения для "Имя":
-			/* 
-				не менее 3-х букв, и не более 13 букв
-				Только русские и латинские буквы(регуляркой)
-				запретить символы и цифры
-			*/
-
 			// Добавить верификацию для E-mail
 			
-			// Добавить ограничения для "Пароль":
-			/*
-				Не менее 7-и символов, Русские или Латинские буквы, хотя бы 1 цифра
-			*/
-
-			// Проверка возраста:
-			/*
-				Только цифры и не более 3
-			*/
-
-			// Проверка возраста
-			/*
-				на пустоту
-			*/
-
-			// Проверка профессии
-			/*
-				на пустоту
-			*/
-			
 			if (isset($data['do_save'])) {
+
 				$errors = array();
-				if (!empty($data['password_1']) && (md5($data['password_1']) != $userpassword->password)) {
-					$errors[] = 'Неправильный пароль!';
+
+				//проверка почты
+
+				if (empty($data['email'])) {
+			    	$errors[] = "Не заполнено обязательное поле - email";
+			  	} elseif ( filter_var($_POST["email"], FILTER_VALIDATE_EMAIL) === false) { 
+			    	$errors[] = "формат почтового ящика неправильный";
+			  	}
+
+				// проверка пароля
+
+				if (!empty($data['password_1'])) {
+					if (strlen($data['password_1']) < 7) {
+						$errors[] = 'Пароль должен иметь длину не менее 7 знаков';
+					}
+					if (md5($data['password_1']) != $userpassword->password) {
+						$errors[] = 'Неправильный пароль!';
+					}
+				}
+
+				// проверка имени
+
+				if (strlen($data['name']) < 3 OR strlen($data['name']) > 13) {
+					$errors[] = 'Имя должно содержать не менее 3, и не более 13 букв!';
+				}
+				if(!preg_match("/^[a-zA-Zа-яА-Я]+$/ui",$data['name'])) {
+				    $errors[] = 'Имя должно содержать только буквы русского или английского алфавита!';
+				}
+
+				// проверка фамилии
+
+				if (strlen($data['surname']) < 4 OR strlen($data['surname']) > 15) {
+					$errors[] = 'Имя должно содержать не менее 3, и не более 13 букв!';
+				}
+				if(!preg_match("/^[a-zA-Zа-яА-Я]+$/ui",$data['surname'])) {
+				    $errors[] = 'Фамилия должна содержать только буквы русского или английского алфавита!';
+				}
+
+				// Проверка возраста
+
+				if (empty($data['age']) OR preg_match("/[^\d]{1}/",$data['age']) OR strlen($data['age']) > 3)
+				{
+					$errors[] = 'Укажите настоящий возраст!';
+				}
+				if ($data['age'] < 16)
+				{
+					$errors[] = 'У нашего приложения возрастное ограничение! 16+!';
+				}
+
+				// Проверка города
+
+				if(!preg_match("/^[a-zA-Zа-яА-Я]+$/ui",$data['city']) OR strlen($data['city']) / 2 < 3) {
+				    $errors[] = 'Такого города не существует на нашей карте!';
 				}
 
 				if(empty($errors)) {
-
+					#preg_replace('/\s/', '', $data['...']);
 					$userinfo->name = $data['name'];
 					$userinfo->surname = $data['surname'];
 					$userinfo->gender = $data['gender'];
@@ -174,7 +198,7 @@
 			<br>
 			<strong>Изменить E-mail: </strong>
 			<p><strong>Ваш E-mail: </strong></p>
-			<input type="email" name="email" value="<?php echo $userpassword->email ?>" required>
+			<input type="text" name="email" value="<?php echo $userpassword->email ?>">
 
 			<br>
 			<strong>Изменить пароль: </strong>
