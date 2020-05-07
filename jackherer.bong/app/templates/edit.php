@@ -187,7 +187,14 @@
 			<?php endif; ?>
 
 			<p><strong>Какая у вас профессия: </strong></p>
-			<input type="text" name="profession" value="<?php echo empty($userinfo->profession == NULL) ? $userinfo->profession : @$data['profession']; ?>" required>
+
+			<select name="profession" required>
+				<option selected="selected" disabled>Выберите из предложенного списка</option>
+				<option value="Фотограф">Фотограф</option>
+				<option value="Актёр">Актёр</option>
+			</select>
+			<br>
+			<p><?php echo empty($userinfo->profession == NULL) ? "Вы: ".$userinfo->profession : "" ?></p>	
 
 			<p><strong>Расскажите о себе: </strong></p>
 			<textarea name="about_me" id="" cols="30" rows="10"><?php echo empty($userinfo->about_me == NULL) ? $userinfo->about_me : @$data['about_me']; ?></textarea>
