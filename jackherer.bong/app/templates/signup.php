@@ -48,7 +48,7 @@
 				
 				$errors = array();
 
-				if (strlen($data['surname']) < 7) {
+				if (strlen($data['password_1']) < 7) {
 					$errors[] = 'Пароль должен иметь длину не менее 7 знаков';
 				}
 
@@ -72,10 +72,18 @@
 					$userinfo->name = NULL;
 					R::store($userinfo);
 
+					function getActivateLink($login) {
+						$key = "777";
+						return md5($key.$login);
+					}
+
 					$userpassword = R::dispense('userpassword');
 					$userpassword->email = $data['email'];
 					$userpassword->password = md5($data['password_1']);
+					$userpassword->activation = getActivateLink($data['email']);
 					R::store($userpassword);
+
+					mail($data['email'], "Регистрация на сайте!", $_SERVER['HTTP_HOST'].$pathIndex."/templates/activate.php?login=".$data['email']."&key=$userpassword->activation");
 
 					#echo '<script>$(function(){$(".form__status").html("Вы успешно зарегистрировались!");})</script>';
 
