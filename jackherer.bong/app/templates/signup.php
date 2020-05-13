@@ -1,6 +1,8 @@
 <?php
 	$pathIndex = "/app";
 	require $_SERVER['DOCUMENT_ROOT'].$pathIndex."/static/php/db_connect.php";
+	require $_SERVER['DOCUMENT_ROOT'].$pathIndex."/templates/functions/checki/checki.php";
+	require $_SERVER['DOCUMENT_ROOT'].$pathIndex."/templates/functions/checki/-signup/checki-signup.php";
 ?>
 
 <!DOCTYPE html>
@@ -41,30 +43,14 @@
 		<?php
 
 			# Регистрация пользователя
-
-			$data = $_POST;
 			
-			if (isset($data['do_signup'])) {
+			if (isset($_POST['do_signup'])) {
 				
 				$errors = array();
 
-				if (strlen($data['password_1']) < 7) {
-					$errors[] = 'Пароль должен иметь длину не менее 7 знаков';
-				}
-
-				if ($data['password_2'] != $data['password_1']) {
-					$errors[] = 'Пароли не совпадают!';
-				}
-
-				if(R::count('userpassword', 'email = ?', array($data['email'])) > 0) {
-					$errors[] = 'Такой E-mail уже используется другим пользователем!';
-				}
-
-				if (empty($data['email'])) {
-			    	$errors[] = "Не заполнено обязательное поле - email";
-			  	} elseif ( filter_var($_POST["email"], FILTER_VALIDATE_EMAIL) === false) { 
-			    	$errors[] = "формат почтового ящика неправильный";
-			  	}
+				checkPassword($_POST['password_1']);
+				checkPasswordMatch($_POST['password_1'], $_POST['password_2']);
+				checkEmailRepeat($_POST['email']);
 
 				if(empty($errors)) {
 
@@ -78,16 +64,16 @@
 					}
 
 					$userpassword = R::dispense('userpassword');
-					$userpassword->email = $data['email'];
-					$userpassword->password = md5($data['password_1']);
-					$userpassword->activation = getActivateLink($data['email']);
+					$userpassword->email = $_POST['email'];
+					$userpassword->password = md5($_POST['password_1']);
+					$userpassword->activation = getActivateLink($_POST['email']);
 					R::store($userpassword);
 
-					mail($data['email'], "Регистрация на сайте!", $_SERVER['HTTP_HOST'].$pathIndex."/templates/activate.php?login=".$data['email']."&key=$userpassword->activation");
+					mail($_POST['email'], "Регистрация на сайте!", $_SERVER['HTTP_HOST'].$pathIndex."/templates/activate.php?login=".$_POST['email']."&key=$userpassword->activation");
 
 					#echo '<script>$(function(){$(".form__status").html("Вы успешно зарегистрировались!");})</script>';
 
-					$user = R::findOne('userpassword', 'email = ?', array($data['email']));
+					$user = R::findOne('userpassword', 'email = ?', array($_POST['email']));
 					$_SESSION['logged_user'] = $user;
 
 					$url_redirect = $pathIndex.'/templates/edit';
@@ -102,11 +88,11 @@
 
 		<form action="signup.php" method="POST" class="form">
 			<p><strong>Ваш E-mail: </strong></p>
-			<input type="email" name="email" value="<?php echo @$data['email']; ?>" required>
+			<input type="email" name="email" value="<?php echo @$_POST['email']; ?>" required>
 			<p><strong>Введите пароль: </strong></p>
-			<input type="password" name="password_1" value="<?php echo @$data['password_1']; ?>" required>
+			<input type="password" name="password_1" value="<?php echo @$_POST['password_1']; ?>" required>
 			<p><strong>Повторите пароль: </strong></p>
-			<input type="password" name="password_2" value="<?php echo @$data['password_2']; ?>" required>
+			<input type="password" name="password_2" value="<?php echo @$_POST['password_2']; ?>" required>
 			<br>
 			<button type="submit" name="do_signup">Зарегистрироваться</button>
 			<span class="form__status"></span>

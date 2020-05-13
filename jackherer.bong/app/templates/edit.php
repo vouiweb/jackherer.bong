@@ -1,6 +1,8 @@
 <?php
 	$pathIndex = "/app";
 	require $_SERVER['DOCUMENT_ROOT'].$pathIndex."/static/php/db_connect.php";
+	require $_SERVER['DOCUMENT_ROOT'].$pathIndex."/templates/functions/checki/checki.php";
+	require $_SERVER['DOCUMENT_ROOT'].$pathIndex."/templates/functions/checki/-edit/checki-edit.php";
 ?>
 
 <!DOCTYPE html>
@@ -45,96 +47,85 @@
 
 			# Регистрация пользователя
 
-			$data = $_POST;
-
 			// Добавить верификацию для E-mail
 			
-			if (isset($data['do_save'])) {
+			if (isset($_POST['do_save'])) {
 
 				$errors = array();
 
-				//проверка почты
+				// Проверка главной фотографии 
 
-				if (empty($data['email'])) {
-			    	$errors[] = "Не заполнено обязательное поле - email";
-			  	} elseif ( filter_var($_POST["email"], FILTER_VALIDATE_EMAIL) === false) { 
-			    	$errors[] = "формат почтового ящика неправильный";
+				function can_upload($file){
+					// если имя пустое, значит файл не выбран
+					if($file['name'] == '')
+						return 'Вы не выбрали файл.';
+
+					/* если размер файла 0, значит его не пропустили настройки 
+					сервера из-за того, что он слишком большой */
+					if($file['size'] == 0)
+						return 'Файл слишком большой.';
+
+					// разбиваем имя файла по точке и получаем массив
+					$getMime = explode('.', $file['name']);
+					// нас интересует последний элемент массива - расширение
+					$mime = strtolower(end($getMime));
+					// объявим массив допустимых расширений
+					$types = array('jpg', 'png', 'gif', 'bmp', 'jpeg');
+
+					// если расширение не входит в список допустимых - return
+					if(!in_array($mime, $types))
+						return 'Недопустимый тип файла.';
+
+					return true;
+				}
+
+				function make_upload($file){	
+					// формируем уникальное имя картинки: случайное число и name
+					$name = mt_rand(0, 10000) . $file['name'];
+					copy($file['tmp_name'], 'img/' . $name);
+				}
+
+				// проверяем, можно ли загружать изображение
+				$check = can_upload($_FILES['file']);
+
+				if($check === true){
+					// загружаем изображение на сервер
+					make_upload($_FILES['file']);
+				}
+
+				checkEmail($_POST['email']);
+
+				// ПРОВЕРКА ПАРОЛЯ
+
+			  	if (!empty($_POST['password_1'])) {
+			  		checkPassword($_POST['password_2']);
+					if (md5($_POST['password_1']) != $userpassword->password) {
+						$errors[] = 'Неправильно введён пароль! Повторите попытку.';
+					}
 			  	}
 
-				// проверка пароля
-
-				if (!empty($data['password_1'])) {
-					if (strlen($data['password_1']) < 7) {
-						$errors[] = 'Пароль должен иметь длину не менее 7 знаков';
-					}
-					if (md5($data['password_1']) != $userpassword->password) {
-						$errors[] = 'Неправильный пароль!';
-					}
-				}
-
-				// проверка имени
-
-				if (strlen($data['name']) < 3 OR strlen($data['name']) > 13) {
-					$errors[] = 'Имя должно содержать не менее 3, и не более 13 букв!';
-				}
-				if(!preg_match("/^[a-zA-Zа-яА-Я]+$/ui",$data['name'])) {
-				    $errors[] = 'Имя должно содержать только буквы русского или английского алфавита!';
-				}
-
-				// проверка фамилии
-
-				if (!empty($data['surname'])) {
-					if (strlen($data['surname']) < 4 OR strlen($data['surname']) > 15) {
-						$errors[] = 'Фамилия должна содержать не менее 4, и не более 15 букв!';
-					}
-					if(!preg_match("/^[a-zA-Zа-яА-Я]+$/ui",$data['surname'])) {
-					    $errors[] = 'Фамилия должна содержать только буквы русского или английского алфавита!';
-					}
-				}
-
-				// Проверка возраста
-
-				if (empty($data['age']) OR preg_match("/[^\d]{1}/",$data['age']) OR strlen($data['age']) > 3)
-				{
-					$errors[] = 'Укажите настоящий возраст!';
-				}
-				if ($data['age'] < 16)
-				{
-					$errors[] = 'У нашего приложения возрастное ограничение! 16+!';
-				}
-
-				// Проверка города
-
-				if(!preg_match("/^[a-zA-Zа-яА-Я]+$/ui",$data['city']) OR strlen($data['city']) / 2 < 3) {
-				    $errors[] = 'Такого города не существует на нашей карте!';
-				}
-
-				// Проверка профессии
-
-				if (empty($data['profession'])) {
-					$errors[] = 'Укажите вашу профессию!';
-				}
+				checkName($_POST['name']);
+				checkSurname($_POST['surname']);
+				checkAge($_POST['age']);
+				checkCity($_POST['city']);
+				checkProfession($_POST['profession']);
 
 				if(empty($errors)) {
-					#preg_replace('/\s/', '', $data['...']);
-					$userinfo->name = $data['name'];
-					$userinfo->surname = $data['surname'];
-					$userinfo->gender = $data['gender'];
-					$userinfo->age = $data['age'];
-					$userinfo->city = $data['city'];
+					#preg_replace('/\s/', '', $_POST['...']);
+					$userinfo->name = $_POST['name'];
+					$userinfo->surname = $_POST['surname'];
+					$userinfo->gender = $_POST['gender'];
+					$userinfo->age = $_POST['age'];
+					$userinfo->city = $_POST['city'];
 					$userinfo->location = $x.';'.$y;
-					$userinfo->profession = $data['profession'];
-					$userinfo->about_me = $data['about_me'];
-					$userinfo->url = $data['url'];
+					$userinfo->profession = $_POST['profession'];
+					$userinfo->about_me = $_POST['about_me'];
+					$userinfo->url = $_POST['url'];
 					$userinfo->status_account = "default";
 					R::store($userinfo);
 
-					$userpassword->email = $data['email'];
-
-					if (!empty($data['password_1'])) {
-						$userpassword->password = md5($data['password_2']);
-					}
-
+					$userpassword->email = $_POST['email'];
+					$userpassword->password = md5($_POST['password_2']);
 					R::store($userpassword);
 
 					echo '<script>$(function(){$(".form__status").html("Сохранено!");})</script>';
@@ -150,12 +141,12 @@
 			<form action="edit.php" method="POST" class="form">
 
 				<h1>Основное: </h1>
-
+				
 				<p><strong>Ваше имя: </strong></p>
-				<input type="text" name="name" value="<?php echo empty($userinfo->name == NULL) ? $userinfo->name : @$data['name']; ?>" required>
+				<input type="text" name="name" value="<?php echo empty($userinfo->name == NULL) ? $userinfo->name : @$_POST['name']; ?>" required>
 
 				<p><strong>Ваше Фамилия: </strong></p>
-				<input type="text" name="surname" value="<?php echo empty($userinfo->surname == NULL) ? $userinfo->surname : @$data['surname']; ?>">
+				<input type="text" name="surname" value="<?php echo empty($userinfo->surname == NULL) ? $userinfo->surname : @$_POST['surname']; ?>">
 
 				<p><strong>Ваш пол: </strong></p>
 				<?php 
@@ -170,9 +161,10 @@
 				?>
 
 				<p><strong>Ваш возраст: </strong></p>
-				<input type="number" name="age" value="<?php echo empty($userinfo->age == NULL) ? $userinfo->age : @$data['age']; ?>" required>
+				<input type="number" name="age" value="<?php echo empty($userinfo->age == NULL) ? $userinfo->age : @$_POST['age']; ?>" required>
 
 				<p><strong>Ваш город: </strong></p>
+
 				<?php 
 				    if (!empty($_SERVER['HTTP_CLIENT_IP']))
 				    {
@@ -189,27 +181,28 @@
 				    $result = file_get_contents("http://ipgeobase.ru:7020/geo?ip=".$ip);
 					$xml = new SimpleXMLElement($result);
 				?>
+
 				<?php if ( !empty($xml->ip->city) ) : ?>
 					<input type="text" name="city" value="<?php echo empty($userinfo->city == NULL) ? $xml->ip->city : $userinfo->city ?>" required>
 				<?php else : ?> 
-					<input type="text" name="city" value="<?php echo empty($userinfo->city == NULL) ? $userinfo->city : @$data['city']; ?>" required>
+					<input type="text" name="city" value="<?php echo empty($userinfo->city == NULL) ? $userinfo->city : @$_POST['city']; ?>" required>
 				<?php endif; ?>
 
 				<p><strong>Какая у вас профессия: </strong></p>
 
 				<select name="profession" required>
 					<option selected="selected" disabled>Выберите из предложенного списка</option>
-					<option value="Фотограф">Фотограф</option>
-					<option value="Актёр">Актёр</option>
+					<option value="Фотограф" <?= $userinfo->profession == 'Фотограф' ? ' selected' : '' ?>>Фотограф</option>
+					<option value="Актёр" <?= $userinfo->profession == 'Актёр' ? ' selected' : '' ?>>Актёр</option>
 				</select>
 				<br>
 				<p><?php echo empty($userinfo->profession == NULL) ? "Вы: ".$userinfo->profession : "" ?></p>	
 
 				<p><strong>Расскажите о себе: </strong></p>
-				<textarea name="about_me" id="" cols="30" rows="10"><?php echo empty($userinfo->about_me == NULL) ? $userinfo->about_me : @$data['about_me']; ?></textarea>
+				<textarea name="about_me" id="" cols="30" rows="10"><?php echo empty($userinfo->about_me == NULL) ? $userinfo->about_me : @$_POST['about_me']; ?></textarea>
 
 				<p><strong>Ссылка на ваше Портфолио/Блог: </strong></p>
-				<input type="url" name="url" value="<?php echo empty($userinfo->url == NULL) ? $userinfo->url : @$data['url']; ?>">
+				<input type="url" name="url" value="<?php echo empty($userinfo->url == NULL) ? $userinfo->url : @$_POST['url']; ?>">
 
 				<br>
 				<strong>Изменить E-mail: </strong>
@@ -224,6 +217,11 @@
 				<input type="password" name="password_2">
 				
 				<br>
+
+				<br>
+				<p><strong>Хотите ли вы загрузить изображение? </strong></p>
+				<input type="file" name="file">
+				<br><br>
 				<button type="submit" name="do_save">Сохранить изменения</button>
 				<span class="form__status"></span>
 			</form>
