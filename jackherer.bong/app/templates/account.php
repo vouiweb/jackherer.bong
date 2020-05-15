@@ -105,6 +105,7 @@
 		<?php 
 			echo "
 				<article>
+					<img src='$userinfo->avatar' alt='' width='200px' height='200px'>
 					<h1>$userinfo->name, </h1> <span>$userinfo->age</span>
 					<h2>$userinfo->profession</h2>
 					<span>$userinfo->city</span>
@@ -144,7 +145,8 @@
 			    		echo '
 				    		<div id="'.$count_img.'">
 					    		<img src="'.$dir.$value.'" alt="" width="150px" height="150px">
-					    		<a href="">Удалить изображение</a>
+					    		<a href="" class="portfolio__delete-image">Удалить изображение</a>
+					    		<a href="" class="portfolio__make-main-image">Сделать главным изображением</a>
 				    		</div>
 			    		';
 			    		$count_img++;
@@ -162,12 +164,21 @@
 		
 		<script>
 			$(document).ready(function() {
-				$(document).on("click", "#portfolio a", function () {
-					   var path_image = $("#" + $(this).parent().attr("id") + " > img").attr("src");
+				$(document).on("click", "#portfolio a.portfolio__delete-image", function () {
+					   var path_DeleteImage = $("#" + $(this).parent().attr("id") + " > img").attr("src");
 				       $.ajax ({
 							url: "account.php",
 							type: "POST",
-							data: {path_picture : path_image},
+							data: {path_DeletePicture : path_DeleteImage},
+							dataType: "html"
+				       });
+				});
+				$(document).on("click", "#portfolio a.portfolio__make-main-image", function () {
+					   var path_MakeMainImage = $("#" + $(this).parent().attr("id") + " > img").attr("src");
+				       $.ajax ({
+							url: "account.php",
+							type: "POST",
+							data: {path_MakeMainPicture : path_MakeMainImage},
 							dataType: "html"
 				       });
 				});
@@ -176,8 +187,12 @@
 
 		<?php 
 
-			if (isset($_POST['path_picture']))
-				delete_picture($_POST['path_picture']);
+			if (isset($_POST['path_DeletePicture']))
+				delete_picture($_POST['path_DeletePicture']);
+
+			if (isset($_POST['path_MakeMainPicture']))
+				$userinfo->avatar = $_POST['path_MakeMainPicture'];
+				R::store($userinfo);
 
 		?>
 	</body>

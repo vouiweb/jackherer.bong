@@ -65,7 +65,6 @@
 			  	}
 
 				checkName($_POST['name']);
-				checkSurname($_POST['surname']);
 				checkAge($_POST['age']);
 				checkCity($_POST['city']);
 				checkProfession($_POST['profession']);
@@ -73,7 +72,6 @@
 				if(empty($errors)) {
 					#preg_replace('/\s/', '', $_POST['...']);
 					$userinfo->name = $_POST['name'];
-					$userinfo->surname = $_POST['surname'];
 					$userinfo->gender = $_POST['gender'];
 					$userinfo->age = $_POST['age'];
 					$userinfo->city = $_POST['city'];
@@ -104,9 +102,6 @@
 				
 				<p><strong>Ваше имя: </strong></p>
 				<input type="text" name="name" value="<?php echo empty($userinfo->name == NULL) ? $userinfo->name : @$_POST['name']; ?>" required>
-
-				<p><strong>Ваше Фамилия: </strong></p>
-				<input type="text" name="surname" value="<?php echo empty($userinfo->surname == NULL) ? $userinfo->surname : @$_POST['surname']; ?>">
 
 				<p><strong>Ваш пол: </strong></p>
 				<?php 
