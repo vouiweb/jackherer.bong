@@ -73,6 +73,14 @@
 				$name = mt_rand(0, 100000) . $file['name'][$i];
 				move_uploaded_file($_FILES['image']['tmp_name'][$i], $GLOBALS['dir'].$name);
 			}
+
+			function delete_picture($img)
+			{
+			    if(file_exists($img)) 
+			    	unlink($img); 
+			    # if(file_exists($img) == FALSE) 
+			    	
+			}
 			
 
 		?>
@@ -129,12 +137,21 @@
 
 			  if (!empty($files))
 			  {
+			  	$count_img = 0;
 			  	arsort($files); $files = array_keys($files);
 			    foreach ($files as $value)
-			    	echo '<img src="'.$dir.$value.'" alt="" width="150px" height="150px">';
+			    	{
+			    		echo '
+				    		<div id="'.$count_img.'">
+					    		<img src="'.$dir.$value.'" alt="" width="150px" height="150px">
+					    		<a href="">Удалить изображение</a>
+				    		</div>
+			    		';
+			    		$count_img++;
+			    	}
 			  }
 			  else
-			    echo "Файлов нет";
+			    echo "Портфолио пустое!";
 			?>
 
 		</div>
@@ -142,6 +159,26 @@
 		<script>
 			$("#account").css("color", "#333333");
 		</script>
+		
+		<script>
+			$(document).ready(function() {
+				$(document).on("click", "#portfolio a", function () {
+					   var path_image = $("#" + $(this).parent().attr("id") + " > img").attr("src");
+				       $.ajax ({
+							url: "account.php",
+							type: "POST",
+							data: {path_picture : path_image},
+							dataType: "html"
+				       });
+				});
+			});
+		</script>
 
+		<?php 
+
+			if (isset($_POST['path_picture']))
+				delete_picture($_POST['path_picture']);
+
+		?>
 	</body>
 </html>
